@@ -20,6 +20,9 @@ export default {
           // Accent (aquamarine)
           AC: "#7FFFD4", // accent hlavná (aquamarine)
           ACS: "#60E1B9", // accent sekundárna (tmavší aquamarine)
+
+          SA: "#FF8C00", // fiery accent hlavná
+          SAS: "#FF7518", // fiery accent sekundárna
         },
       },
     },
