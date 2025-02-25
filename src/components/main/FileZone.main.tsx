@@ -1,4 +1,5 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { uploadFile } from "../apis";
 
 const FileZone: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -7,10 +8,16 @@ const FileZone: React.FC = () => {
   // Handler for when a file is selected via the file input
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      console.log('setfile trigered')
       setFile(e.target.files[0]);
     }
   };
-
+  const handleDeleteFile = () => {
+    setFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
   // Handler for when a file is dropped in the drop zone
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -27,23 +34,9 @@ const FileZone: React.FC = () => {
   // Function to upload the file to the backend
   const handleUpload = async () => {
     if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch("https://your-backend-endpoint/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-      console.log("Upload successful:", data);
-    } catch (error) {
-      console.error("Upload error:", error);
-    }
+    uploadFile(file)
   };
-
+  useEffect(() => console.log('file: ', file ? true : false), [file])
   return (
     <div className="w-full flex flex-col">
       {/* File drop zone */}
@@ -53,7 +46,7 @@ const FileZone: React.FC = () => {
         className="flex w-[33%] h-96 mx-auto border-dashed border-x-2 border-t-2 border-SCS/80 rounded-t-lg shadow-md shadow-SC/35"
       >
         <div className="flex flex-col justify-center w-full">
-          <h1 className="text-SCS/10 font-black text-7xl">upload file</h1>
+          <h1 className="text-SCS/10 font-black text-7xl">{file ? 'click upload' : 'upload file'}</h1>
           <p className="text-7xl text-black/10">📤</p>
         </div>
       </div>
@@ -61,13 +54,14 @@ const FileZone: React.FC = () => {
       {/* File input */}
       <div className="flex flex-row-reverse w-[33%] mx-auto border-2 border-SCS rounded-b-lg shadow-md shadow-SC/35 items-center justify-between">
         <button
-          className={`${file? 'hidden':''} px-4 py-2 bg-SCS rounded-br-md`}
+          className={`${file ? 'hidden' : ''} px-4 py-2 bg-SCS rounded-br-md`}
           onClick={() => fileInputRef.current?.click()}
         >
           or browse
         </button>
         <button
-          className={`${file? '':'hidden'} px-4 py-2 bg-AC rounded-br-md`}
+          className={`${file ? '' : 'hidden'} px-4 py-2 bg-AC rounded-br-md`}
+          onClick={handleUpload}
         >
           upload
         </button>
@@ -82,14 +76,14 @@ const FileZone: React.FC = () => {
           {file ? file.name : "No file selected"}
         </p>
         <button
-          className={`${file? '':'hidden'} px-4 py-2 text-SA rounded-br-md`}
-          onClick={()=>setFile(null)}
+          className={`${file ? '' : 'hidden'} px-4 py-2 text-SA rounded-br-md`}
+          onClick={handleDeleteFile}
         >
           ✕
         </button>
       </div>
 
-      </div>
+    </div>
   );
 };
 
