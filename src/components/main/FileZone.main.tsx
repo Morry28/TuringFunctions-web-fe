@@ -1,15 +1,27 @@
 import React, { useEffect, useRef, useState } from "react";
 import { uploadFile } from "../apis";
-
+import { allowedTypes } from '../../consts/fileTypes'
 const FileZone: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [wrongFileType, setWrongFileType] = useState<boolean>(false)
+  const [pleaseLogin, setPleaseLogin] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handler for when a file is selected via the file input
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      console.log('setfile trigered')
-      setFile(e.target.files[0]);
+      const file = e.target.files[0];
+
+      if (!allowedTypes.includes(file.type)) {
+        console.error("Neplatný formát súboru");
+        setWrongFileType(true)
+        return;
+      }
+      setWrongFileType(false)
+
+      setFile(file);
     }
   };
   const handleDeleteFile = () => {
@@ -17,12 +29,24 @@ const FileZone: React.FC = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+    setLoading(false)
+
   };
   // Handler for when a file is dropped in the drop zone
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
+      const file = e.dataTransfer.files[0];
+
+      if (!allowedTypes.includes(file.type)) {
+        console.error("Neplatný formát súboru");
+        setWrongFileType(true)
+        return;
+      }
+      setWrongFileType(false)
+
+      console.log("setFile triggered");
+      setFile(file);
     }
   };
 
@@ -34,9 +58,19 @@ const FileZone: React.FC = () => {
   // Function to upload the file to the backend
   const handleUpload = async () => {
     if (!file) return;
+    if (!window.isLoggedIn) {
+      setPleaseLogin(true)
+      return
+    }
+    setLoading(true)
     uploadFile(file)
+
   };
-  useEffect(() => console.log('file: ', file ? true : false), [file])
+  // Handling correction of flow
+  useEffect(() => {
+    if (window.isLoggedIn) setPleaseLogin(false)
+  }, [window.isLoggedIn])
+
   return (
     <div className="w-full flex flex-col">
       {/* File drop zone */}
@@ -62,11 +96,13 @@ const FileZone: React.FC = () => {
         <button
           className={`${file ? '' : 'hidden'} px-4 py-2 bg-AC rounded-br-md`}
           onClick={handleUpload}
+          disabled={loading?true:false}
         >
-          upload
+          {loading? <img src="/loading.svg" className="size-4 my-1"/>:'upload'}
         </button>
         <input
           type="file"
+          accept=".json,.csv,.txt"
           ref={fileInputRef}
           onChange={handleFileChange}
           style={{ display: "none" }}
@@ -78,10 +114,20 @@ const FileZone: React.FC = () => {
         <button
           className={`${file ? '' : 'hidden'} px-4 py-2 text-SA rounded-br-md`}
           onClick={handleDeleteFile}
+          disabled={loading?true:false}
+
         >
-          ✕
+          {loading?'':'✕'}
         </button>
       </div>
+      {wrongFileType && <p className="text-red-600 font-bold pt-8">Wrong file type !</p>}
+      {pleaseLogin && <button
+        className={`${file ? '' : 'hidden'} px-4 py-2 text-SA rounded-br-md flex items-center justify-center gap-4`}
+        onClick={() => setPleaseLogin(false)}
+      >
+        <p>✕</p>
+        <p className="text-AC"> plase log in first to use Peanuts chat app</p>
+      </button>}
 
     </div>
   );
