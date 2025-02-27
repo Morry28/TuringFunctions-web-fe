@@ -1,9 +1,11 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
 import { getFirestore, doc, getDoc, setDoc, initializeFirestore, updateDoc } from "firebase/firestore";
+import dotenv from 'dotenv'
+dotenv.config()
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAaTUgsoT58ct5SsGah8SG7Wb_lqUSWALM",
+  apiKey: process.env.GOOGLE_API_KEY,
   authDomain: "flu-ai.firebaseapp.com",
   projectId: "flu-ai",
   storageBucket: "flu-ai.firebasestorage.app",
