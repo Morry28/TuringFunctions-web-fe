@@ -1,20 +1,30 @@
-import React from "react"
+import React, { useState } from "react"
 import ExploreApi from "./ExploreApi.main"
 import FileZone from "./FileZone.main"
+import ChatZone from "./ChatZone.main"
+import SellTextHead from "./SellTextHead.main"
 
-export default function Landing(){
+export default function Landing() {
+    const [isChatReady, setIsChatReady] = useState<string>("")
 
- 
+    const processSuccess = (data: any): void => {
+        setIsChatReady(data)
+    }
     return (
         <div className="flex flex-col gap-16 pt-16">
-            <div className="inline-flex mx-auto">
-                <h1 className="text-AC">PRICE</h1>
-                <h1 className="text-TC">=/=</h1>
-                <h1 className="text-SA">SIZE</h1>
+            {!isChatReady? <SellTextHead /> : null}
+
+            <div>
+                {!isChatReady?
+                    <FileZone handleSuccessFileSave={processSuccess} />
+                    :
+                    <ChatZone name={isChatReady} />
+                }
             </div>
-            <div><FileZone/></div>
-            <div><ExploreApi/></div>
             
+            <div>
+                {!isChatReady? <ExploreApi /> : null}</div>
+
 
         </div>
     )

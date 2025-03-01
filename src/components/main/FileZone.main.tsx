@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { uploadFile } from "../apis";
+import { saveFile } from "../apis";
 import { allowedTypes } from '../../consts/fileTypes'
-const FileZone: React.FC = () => {
+
+type FileZoneProps = {
+  handleSuccessFileSave: (res: any) => void;
+};
+const FileZone: React.FC<FileZoneProps> = ({ handleSuccessFileSave }) => {
   const [file, setFile] = useState<File | null>(null);
   const [wrongFileType, setWrongFileType] = useState<boolean>(false)
   const [pleaseLogin, setPleaseLogin] = useState<boolean>(false)
@@ -57,13 +61,17 @@ const FileZone: React.FC = () => {
 
   // Function to upload the file to the backend
   const handleUpload = async () => {
+
     if (!file) return;
     if (!window.isLoggedIn) {
       setPleaseLogin(true)
       return
     }
     setLoading(true)
-    uploadFile(file)
+    const res = await saveFile(file)
+    handleSuccessFileSave(res)
+    console.log(res)
+    setLoading(false)
 
   };
   // Handling correction of flow

@@ -1,11 +1,10 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
 import { getFirestore, doc, getDoc, setDoc, initializeFirestore, updateDoc } from "firebase/firestore";
-import dotenv from 'dotenv'
-dotenv.config()
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  apiKey: process.env.GOOGLE_API_KEY,
+  apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
   authDomain: "flu-ai.firebaseapp.com",
   projectId: "flu-ai",
   storageBucket: "flu-ai.firebasestorage.app",
@@ -16,7 +15,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig)
 export const db = getFirestore(app);
-const auth = getAuth(app)
+export const auth = getAuth(app)
+export const storage = getStorage(app)
 const provider = new GoogleAuthProvider()
 
 export const signInWithGoogle = async () => signInWithPopup(auth, provider)
