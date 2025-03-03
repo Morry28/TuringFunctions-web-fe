@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { signInWithGoogle } from "../../firebase"
 import { userCredit } from "../../firebase"
+import { testConection } from "../apis";
 declare global {
     interface Window {
       isLoggedIn?: boolean;
@@ -21,6 +22,7 @@ export default function Header() {
     const [loading,setLoading] = useState<boolean>(false)
 
     const handleLoggin = async () => {
+        console.log(await testConection())
         setLoading(true)
         try {
             const result = await signInWithGoogle()
